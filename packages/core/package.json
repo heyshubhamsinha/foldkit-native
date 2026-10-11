@@ -1,0 +1,85 @@
+{
+  "name": "@foldkit-native/core",
+  "version": "0.1.0",
+  "description": "Foldkit's architecture - Model, Message, update, Command - rendering to real native iOS and Android views.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./command": {
+      "types": "./dist/command.d.ts",
+      "import": "./dist/command.js"
+    },
+    "./message": {
+      "types": "./dist/message.d.ts",
+      "import": "./dist/message.js"
+    },
+    "./update": {
+      "types": "./dist/update.d.ts",
+      "import": "./dist/update.js"
+    },
+    "./struct": {
+      "types": "./dist/struct.d.ts",
+      "import": "./dist/struct.js"
+    },
+    "./submodel": {
+      "types": "./dist/view/submodel.d.ts",
+      "import": "./dist/view/submodel.js"
+    },
+    "./view": {
+      "types": "./dist/view/builder.d.ts",
+      "import": "./dist/view/builder.js"
+    },
+    "./subscription": {
+      "types": "./dist/runtime/subscriptions.d.ts",
+      "import": "./dist/runtime/subscriptions.js"
+    },
+    "./managedResource": {
+      "types": "./dist/runtime/managedResource.d.ts",
+      "import": "./dist/runtime/managedResource.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime/runtime.d.ts",
+      "import": "./dist/runtime/runtime.js"
+    },
+    "./dispatch": {
+      "types": "./dist/runtime/dispatch.d.ts",
+      "import": "./dist/runtime/dispatch.js"
+    },
+    "./renderer": {
+      "types": "./dist/renderer/fabricRenderer.d.ts",
+      "import": "./dist/renderer/fabricRenderer.js"
+    },
+    "./platform": {
+      "types": "./dist/platform.d.ts",
+      "import": "./dist/platform.js"
+    },
+    "./story": {
+      "types": "./dist/test/story.d.ts",
+      "import": "./dist/test/story.js"
+    },
+    "./scene": {
+      "types": "./dist/test/scene.d.ts",
+      "import": "./dist/test/scene.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@ng-native/fabric": "^0.10.0"
+  },
+  "peerDependencies": {
+    "effect": "^4.0.0"
+  },
+  "license": "MIT"
+}

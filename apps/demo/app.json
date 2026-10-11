@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Foldkit Native",
+    "slug": "foldkit-native-demo",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "dev.foldkit.native.demo"
+    },
+    "android": {
+      "package": "dev.foldkit.native.demo"
+    }
+  }
+}

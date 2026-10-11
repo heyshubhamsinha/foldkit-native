@@ -1,0 +1,25 @@
+{
+  "name": "@foldkit-native/demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The Foldkit Native counter, running as real native views.",
+  "main": "src/main.ts",
+  "scripts": {
+    "start": "expo start",
+    "ios": "expo start --ios",
+    "android": "expo start --android",
+    "bundle": "expo export --platform ios --output-dir .expo/export-check",
+    "bundle:android": "expo export --platform android --output-dir .expo/export-check"
+  },
+  "dependencies": {
+    "@foldkit-native/core": "*",
+    "effect": "^4.0.0",
+    "expo": "^57.0.27",
+    "react": "19.2.3",
+    "react-native": "0.86.3"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.4",
+    "typescript": "~6.0.3"
+  }
+}

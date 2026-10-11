@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+
+# Expo
+.expo/
+.expo-shared/
+android/
+ios/
+*.log
+
+# Local scratch
+*.tgz

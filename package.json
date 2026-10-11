@@ -1,0 +1,29 @@
+{
+  "name": "foldkit-native-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Foldkit, rendered as real native iOS and Android views.",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace @foldkit-native/core",
+    "typecheck": "tsc -p packages/core/tsconfig.json --noEmit && tsc -p apps/demo/tsconfig.test.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "demo": "npm run start --workspace @foldkit-native/demo",
+    "bundle": "npm run bundle --workspace @foldkit-native/demo"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT"
+}
