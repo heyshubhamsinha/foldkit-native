@@ -190,15 +190,27 @@ there is no input element to reimplement.
 
 ## The example
 
-`apps/demo` is a Todo list: add, tick, delete, with a bound text input and a
-keyed scrollable list. Removing a row creates **zero** new native nodes, because a
-keyed child is matched wherever it moved.
+`apps/demo` is a chat, rebuilt from
+[margelo/ai-chat-demo-with-rag](https://github.com/margelo/ai-chat-demo-with-rag)
+on this architecture. A conversation that streams token by token from Apple's
+on-device model, can be stopped mid-sentence, keeps a chat history, attaches
+photos, and renders replies as markdown parsed into native text elements — no key,
+no network, no server.
+
+The part worth reading is `apps/demo/src/chat/model.ts`. The streaming is not
+driven by a flag anywhere: the subscription watches the request the Model says it
+wants answered, and because `activeRequest` leaves the in-flight reply out, a token
+arriving cannot change it. One string encodes every transition — a token, a stop, a
+new message — and there is no second condition to keep in agreement with the first.
 
 ```bash
 npm install
-npm test          # 68 tests, no simulator
-npm run demo      # then open exp://<your-lan-ip>:8081 in Expo Go
+npm test          # 103 tests, no simulator
+npm run ios       # a development build — Apple Foundation Models is a native module
 ```
+
+Requires iOS 26+ on Apple Intelligence hardware. Android runs the app; the model
+is not there, and the app says so rather than failing quietly.
 
 ## Documentation
 
@@ -216,6 +228,10 @@ managed resources, Submodels and both test styles are implemented and tested.
 **The device run is not yet confirmed** — see
 [docs/LEARNINGS.md](docs/LEARNINGS.md#the-one-thing-still-unproven). Navigation,
 DevTools and MCP are not built. APIs can change between `0.x` releases.
+
+The demo's retrieval half was dropped: `@react-native-ai/apple` executes tool calls
+itself, so a tool call never becomes a Message and `update` cannot drive the loop.
+See [docs/LEARNINGS.md](docs/LEARNINGS.md#10-a-tool-loop-the-provider-would-not-give-up).
 
 ## Credits
 

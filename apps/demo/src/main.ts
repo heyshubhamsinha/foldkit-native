@@ -19,9 +19,12 @@
  *
  * `expo` is imported for its runtime, not for a component: Metro only runs its
  * fetch, URL, TextDecoderStream and structuredClone polyfills when something
- * imports it, and in a release build nothing else does.
+ * imports it, and in a release build nothing else does. `./polyfills` comes first
+ * for the same reason - it installs the `ReadableStream` the AI SDK's `streamText`
+ * is built on, and a stream that does not exist at boot does not exist later.
  */
 
+import './polyfills'
 import 'expo'
 import { AppRegistry, Appearance, Dimensions, Image, PixelRatio, Platform, processColor } from 'react-native'
 import { Layer, ManagedRuntime } from 'effect'
@@ -61,14 +64,14 @@ AppRegistry.registerRunnable('main', ({ rootTag }) => {
       // A failure inside a view or a handler must not take the app down: the
       // runtime catches it and the screen keeps whatever was last drawn, which
       // is a far better failure mode than a white screen.
-      console.error(`[todo] ${context} failed`, error)
+      console.error(`[chat] ${context} failed`, error)
     },
   })
 
   const report = (): void => {
     if (typeof __DEV__ === 'undefined' || !__DEV__) return
     const { createdNodes, commits } = surface.engine.stats
-    console.log(`[todo] running — rootTag=${tag} · ${createdNodes} native nodes · ${commits} commit(s)`)
+    console.log(`[chat] running — rootTag=${tag} · ${createdNodes} native nodes · ${commits} commit(s)`)
   }
   report()
 

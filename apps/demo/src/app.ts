@@ -1,23 +1,26 @@
 /**
  * The application.
  *
- * The Todo list is the whole thing: one Model, five Messages, one pure `update`,
- * one view. There is no parent to fold into and no Submodel boundary, because
- * this app *is* the top level - which is the other half of what the counter
- * demonstrates. The counter needs `foldChild` because it is embedded in
- * something else; this one does not, and adding the indirection anyway would be
- * two layers of ceremony that buy nothing.
+ * One Model, one pure `update`, one view, and one subscription - which is the piece
+ * the Todo list did not need. The subscription is declared here rather than in
+ * `chat/stream.ts` only because this is where the framework's `subscriptions` field
+ * lives; the interesting half is that there is no half.
  *
- * The five declarations below are the entire contract between an application and
- * this framework. Everything else in the repo is machinery around them.
+ * Compare the size of this with what it declares. The chat streams a reply token by
+ * token, can be stopped halfway, and carries a whole conversation as one immutable
+ * value - and the declaration of all of that is this file. Nothing here starts a
+ * stream, and nothing here has to know how one ends.
  */
 
 import { Runtime } from '@foldkit-native/core'
-import * as Todo from './todo'
+import * as Chat from './chat/model'
+import { chatView } from './chat/view'
+import { replyStream } from './chat/stream'
 
-export const app = Runtime.makeApplication<Todo.TodoModel, Todo.TodoMessage>({
-  Model: Todo.TodoModel,
-  init: () => ({ model: Todo.init }),
-  update: Todo.update,
-  view: Todo.todoView,
+export const app = Runtime.makeApplication<Chat.ChatModel, Chat.ChatMessage>({
+  Model: Chat.ChatModel,
+  init: () => ({ model: Chat.init }),
+  update: Chat.update,
+  view: chatView,
+  subscriptions: { reply: replyStream },
 })

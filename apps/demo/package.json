@@ -2,19 +2,24 @@
   "name": "@foldkit-native/demo",
   "version": "0.1.0",
   "private": true,
-  "description": "The Foldkit Native counter, running as real native views.",
+  "description": "A Foldkit Native chat, running on Apple's on-device model as real native views.",
   "main": "src/main.ts",
   "scripts": {
-    "start": "expo start",
-    "ios": "expo start --ios",
-    "android": "expo start --android",
+    "start": "expo start --dev-client",
+    "ios": "expo run:ios",
+    "android": "expo run:android",
     "bundle": "expo export --platform ios --output-dir .expo/export-check",
     "bundle:android": "expo export --platform android --output-dir .expo/export-check"
   },
   "dependencies": {
     "@foldkit-native/core": "*",
+    "@react-native-ai/apple": "^0.12.0",
+    "@stardazed/streams-text-encoding": "^1.0.2",
+    "@ungap/structured-clone": "^1.4.0",
+    "ai": "^6.0.303",
     "effect": "^4.0.0",
     "expo": "^57.0.27",
+    "expo-image-picker": "~17.0.11",
     "react": "19.2.3",
     "react-native": "0.86.3"
   },

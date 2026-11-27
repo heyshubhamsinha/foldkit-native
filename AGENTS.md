@@ -6,7 +6,7 @@ How this repository is put together, and what a change here has to respect.
 
 ```
 packages/core     @foldkit-native/core — the framework
-apps/demo         the counter, running on a device
+apps/demo         the chat, running on a device
 docs              ARCHITECTURE.md — why it is shaped this way
 ```
 
@@ -16,20 +16,31 @@ to prove the core works against a real device surface.
 ## Commands
 
 ```bash
-npm test          # vitest — 68 tests, no simulator, no watch
+npm test          # vitest — 103 tests, no simulator, no watch
 npm run build     # tsc, into packages/core/dist
 npm run typecheck # core, then the demo
 npm run bundle    # expo export — the demo as Hermes bytecode, no simulator
-npm run demo      # expo start
+npm run demo      # expo start --dev-client
 ```
 
 A change is done when `npm test`, `npm run typecheck` and `npm run bundle` all
 pass.
 
-**`npm run bundle` is not optional.** Typechecking passed on a demo that could
-not load: Metro resolves a specifier literally and does not do the `.js` → `.ts`
-rewrite `tsc` does. That is not a type error. Bundling is the only check that
-sees it, and it needs no simulator.
+**`npm run bundle` is not optional, and neither is reading its output.** Typechecking
+passed on a demo that could not load: Metro resolves a specifier literally and does
+not do the `.js` → `.ts` rewrite `tsc` does. That is not a type error. Bundling is
+the only check that sees it, and it needs no simulator.
+
+It is also the only check that sees a branch the bundler *deleted*. A guard on
+`process.env.EXPO_PUBLIC_*` folds at build time, and everything after it is removed
+from the binary — while the app keeps behaving correctly, because the branch was
+true. That happened here; see `docs/LEARNINGS.md#9`. When a change adds a
+conditional around code that only runs in some builds, grep the exported bundle for
+a string that must be in it.
+
+**`apps/demo` needs a development build, not Expo Go.** `@react-native-ai/apple` is
+a native module, so `npm run demo` serves a dev client and `npm run ios` builds one.
+`expo start` alone will start, and the model will not be there.
 
 An earlier `babel.config.js` set `unstable_transformImportMeta`, because Hermes
 had no syntax for the `import.meta.env` that `effect` reads. **SDK 57 enabled
@@ -131,8 +142,16 @@ Three kinds, and each answers a different question:
 - `managedResource.test.ts` — acquire, release, and the service reaching a Command.
 - `storyScene.test.ts` — the Story and Scene APIs, which is also how they are
   documented.
-- `apps/demo/test/todo.test.ts` — the Todo example, in both styles. An example that
-  does not run is worse than no example.
+- `apps/demo/test/todo.test.ts` — the Todo list, in both styles. Still the smallest
+  complete example, and an example that does not run is worse than no example.
+- `apps/demo/test/chat.test.ts` — the streaming chat, in both styles.
 
 A new feature needs a Story (pure, total over the state machine) and, if it
 introduces UI, a Scene (through the view, located by accessibility label).
+
+**A test that cannot fail is not a test.** Every load-bearing invariant in the chat
+was checked by deliberately breaking it and confirming one test went red. Do that
+before believing a new one. The one that matters most: the subscription restarts
+when its dependency changes, so `activeRequest` must not change when a token
+arrives. Nothing in the types, and nothing in a unit test of any single function,
+can see that — only a test about when the loop runs.

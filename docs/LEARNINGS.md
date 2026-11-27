@@ -220,6 +220,61 @@ were built to test one hypothesis and were structurally incapable of refuting
 it. The next diagnostic should be designed around the answer that would change
 what we do — and if no answer would, it is not worth building.
 
+## 9. A guard clause the bundler deleted
+
+The chat streamed from OpenAI, and the first version checked for a missing key:
+
+```ts
+const apiKey = process.env.EXPO_PUBLIC_OPENAI_API_KEY
+if (apiKey === undefined || apiKey === '') return          // ← this line
+resume(Effect.succeed(openStream(body, apiKey, signal)))
+```
+
+`babel-preset-expo` inlines `EXPO_PUBLIC_*` at build time. In a build with no
+`.env`, `apiKey` is the literal `undefined`, so the condition folds, the early
+`return` survives, and everything after it is dead — the endpoint, the SSE parser,
+the `XMLHttpRequest`. The shipped bundle contained a `streamReply` with nothing in
+it but the no-key branch.
+
+**Nothing was broken.** The app opened, reported "no key", and behaved correctly.
+That is what made it dangerous: it would have been found by whoever first built
+with a real key, shipped, and discovered the request code was no longer in the
+binary — not by anything in this repository.
+
+Typechecking could not see it, and neither could the 113 tests, because the
+deleted code was correct and the branch it sat behind was true. It was found by
+reading the minified output for a string that should have been in it.
+
+**A guard on a build-time constant is not a runtime guard.** The fix was to delete
+the branch: a build with no key now makes a request, gets a 401, and reports that,
+which is one code path that always exists. `npm run bundle` is the only check that
+can see this class of bug, which is the same reason it is not optional — and the
+reason it is worth grepping the output for the thing you expect to find, not just
+watching it succeed.
+
+## 10. A tool loop the provider would not give up
+
+The original Margelo app retrieves passages before answering. In Foldkit that loop
+is expressible *entirely* in the Model: the model asks for a search, that arrives
+as a Message, `update` answers it with a Command, the answer lands, the answer is
+part of the request, the request changed, so the subscription re-runs it. There is
+no loop in the code — the loop is the Model's shape.
+
+`@react-native-ai/apple` cannot support that. Its tools are executed by Apple, and
+the AI SDK's step callbacks (`maxSteps`, `onStepStart`, `onStepFinish`) do not run.
+A tool call therefore never becomes a Message and `update` never sees it.
+
+The obvious workaround — Apple's `execute` dispatches `RequestedSearch` and awaits
+a promise the runtime resolves — deadlocks. The search landing marks the call
+resolved, the request changes, and the subscription **interrupts the very
+`streamText` that is waiting on that promise**.
+
+**Not every capability can be moved across without moving the architecture that
+made it worth having.** Swapping the transport was a one-file change and keeping
+the loop would have required a ref the provider does not expose. The RAG half was
+dropped and recorded rather than faked with a `Promise` that resolves into a
+restart.
+
 ---
 
 ## Things that worked
